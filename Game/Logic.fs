@@ -79,9 +79,8 @@ let generateRandomField (startPosition: Position) (game: Field) randomize : Mine
   let field = {game = game; cells = [] }
   let excludedPositions = positionsAround startPosition field @ [startPosition]
   let excludedLinearPositions = List.map field.Linear excludedPositions
-  let notInExcluded p = List.exists (fun pp -> p <> pp) excludedLinearPositions
   let bombs = [0 .. field.Size - 1]
-              |> List.filter notInExcluded
+              |> List.except excludedLinearPositions
               |> randomize
               |> List.take game.mines
   let linearToCell p =

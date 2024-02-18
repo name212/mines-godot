@@ -1,4 +1,4 @@
-module Tests
+module PositionAroundTests
 
 open NUnit.Framework
 open FsUnit
