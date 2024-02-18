@@ -9,8 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="PositionAround.fs" />
         <Compile Include="GenerateRandomField.fs" />
+        <Compile Include="MinesField.fs" />
+        <Compile Include="PositionAround.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
