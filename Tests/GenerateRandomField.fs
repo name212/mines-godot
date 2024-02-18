@@ -28,3 +28,12 @@ let ``Field generator should not set bomb around start position `` () =
     cellsAround testField startPosition
     |> List.filter (_.hasBomb)
     |> should haveLength 0
+
+[<Test>]  
+let ``Field generator should not set bomb around start position when all another cells should be with mines`` () =
+    let w, h = 8, 8
+    // 9 - is start position with around cells 
+    let tstField = generateRandomField startPosition {width = w; height = h; mines = (w * h - 9) } Utils.shuffle
+    cellsAround tstField startPosition
+    |> List.filter (_.hasBomb)
+    |> should haveLength 0
