@@ -1,0 +1,5 @@
+namespace mines
+
+open Types
+
+
