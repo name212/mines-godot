@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Game", "Game\Game.fsproj", "{05C6740A-8F37-4C50-BC7A-A1810883A87B}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ConsoleMines", "ConsoleMines\ConsoleMines.fsproj", "{B376FA9F-7838-40AE-B7FF-F8A5AB545BBD}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "Tests\Tests.fsproj", "{E9249B40-1611-4207-9FFE-F1E349FFA7A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05C6740A-8F37-4C50-BC7A-A1810883A87B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C6740A-8F37-4C50-BC7A-A1810883A87B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05C6740A-8F37-4C50-BC7A-A1810883A87B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05C6740A-8F37-4C50-BC7A-A1810883A87B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B376FA9F-7838-40AE-B7FF-F8A5AB545BBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B376FA9F-7838-40AE-B7FF-F8A5AB545BBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B376FA9F-7838-40AE-B7FF-F8A5AB545BBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B376FA9F-7838-40AE-B7FF-F8A5AB545BBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9249B40-1611-4207-9FFE-F1E349FFA7A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9249B40-1611-4207-9FFE-F1E349FFA7A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9249B40-1611-4207-9FFE-F1E349FFA7A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9249B40-1611-4207-9FFE-F1E349FFA7A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
