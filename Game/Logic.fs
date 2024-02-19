@@ -42,13 +42,29 @@ let openEmptyCellsAround field pos =
      []
       
   let rec openCells cellsForProcess processedCells =
-    let cells = cellsForProcess |> List.distinctBy (fun c -> c.pos.x * 10000 + c.pos.y * 1000000)
+    let notProcessed cell =
+      match List.tryFind (fun c -> c.pos = cell.pos) processedCells with
+      | Some(_) -> false
+      | None -> true
+    
+    let positionHash c = c.pos.x * 10000 + c.pos.y * 1000000
+      
+    let cells = cellsForProcess
+                |> List.distinctBy positionHash
+                |> List.filter notProcessed
     match cells with
     | [] -> processedCells
     | h :: t -> openCells ((processCell h) @ t) ([{h with state = Opened}] @ processedCells)
  
   let cell = field.MustCell pos
-  openCells [cell] []
+  let processedCells = openCells [cell] []
+  
+  let statesFromProcessedCells c =
+    match List.tryFind (fun cc -> cc.pos = c.pos) processedCells with
+    | Some(x) -> x
+    | None -> c
+  
+  List.map statesFromProcessedCells field.cells
 
 let changeCellState field pos newState : MinesField =
    let buildNewField c =
