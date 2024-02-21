@@ -28,6 +28,9 @@ let cellsAround field pos: Cell list =
   let positions = positionsAround pos field
   List.map field.MustCell positions
 
+let position c =
+  c.pos
+
 let openEmptyCellsAround field pos =
   let processCell cell =
     let notOpened = cellsAround field cell.pos |> List.filter (fun c -> c.state <> Opened)

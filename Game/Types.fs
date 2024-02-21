@@ -8,7 +8,9 @@ type Cell = {pos: Position; hasBomb: bool; state: CellState; bombsAround: int}
 
 type CellWalker = Cell -> Cell
 
-type Field = {width: int; height: int; mines: int}
+type Field = {width: int; height: int; mines: int} with
+    member f.Size = f.height * f.width
+end
 
 type MinesField = {game: Field; cells: Cell list} with
   member f.Linear p = p.y * f.game.width + p.x
@@ -16,7 +18,7 @@ type MinesField = {game: Field; cells: Cell list} with
     let x = index % f.game.width
     let y = index / f.game.width
     (x, y)
-  member f.Size = f.game.height * f.game.width
+  member f.Size = f.game.Size
   member f.Cell p = List.tryItem (f.Linear p) f.cells
   member f.MustCell p = f.cells.Item (f.Linear p)
 end
