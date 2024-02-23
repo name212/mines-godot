@@ -11,8 +11,9 @@
     <ItemGroup>
         <Compile Include="GenerateRandomField.fs" />
         <Compile Include="MinesField.fs" />
+        <Compile Include="ChangeCellState.fs" />
         <Compile Include="PositionAround.fs" />
-        <Compile Include="OpenEmptyCells.fs" />
+        <Compile Include="RecalculateField.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

@@ -7,12 +7,10 @@ open Types
 
 let testField: Field = {width = 8; height = 8; mines = 10}
 
-let testMinesField = generateRandomField {x = 0; y = 0} testField id
-
 [<Test>]
 let ``Top left position should return 3 positions around`` () =
     let p = {x = 0; y = 0}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 3
     ps |> should not' (contain p)
@@ -24,7 +22,7 @@ let ``Top left position should return 3 positions around`` () =
 [<Test>]   
 let ``Top middle position should return 5 positions around`` () =
     let p = {x = 4; y = 0}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 5
     ps |> should not' (contain p)
@@ -38,7 +36,7 @@ let ``Top middle position should return 5 positions around`` () =
 [<Test>]
 let ``Top right position should return 3 positions around`` () =
     let p = {x = 7; y = 0}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 3
     ps |> should not' (contain p)
@@ -50,7 +48,7 @@ let ``Top right position should return 3 positions around`` () =
 [<Test>]   
 let ``Left middle position should return 5 positions around`` () =
     let p = {x = 0; y = 4}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 5
     ps |> should not' (contain p)
@@ -64,7 +62,7 @@ let ``Left middle position should return 5 positions around`` () =
 [<Test>]  
 let ``Left bottom position should return 3 positions around`` () =
     let p = {x = 0; y = 7}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 3
     ps |> should not' (contain p)
@@ -76,7 +74,7 @@ let ``Left bottom position should return 3 positions around`` () =
 [<Test>]
 let ``Middle of bottom position should return 5 positions around`` () =
     let p = {x = 4; y = 7}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 5
     ps |> should not' (contain p)
@@ -90,7 +88,7 @@ let ``Middle of bottom position should return 5 positions around`` () =
 [<Test>] 
 let ``Right of bottom position should return 3 positions around`` () =
     let p = {x = 7; y = 7}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 3
     ps |> should not' (contain p)
@@ -102,7 +100,7 @@ let ``Right of bottom position should return 3 positions around`` () =
 [<Test>]
 let ``Bottom of right position should return 5 positions around`` () =
     let p = {x = 4; y = 0}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 5
     ps |> should not' (contain p)
@@ -116,7 +114,7 @@ let ``Bottom of right position should return 5 positions around`` () =
 [<Test>]    
 let ``Center position should return 8 positions around`` () =
     let p = {x = 4; y = 4}
-    let ps = positionsAround p testMinesField
+    let ps = positionsAround p testField
     
     ps |> should haveLength 8
     ps |> should not' (contain p)

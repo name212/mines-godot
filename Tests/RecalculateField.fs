@@ -1,4 +1,4 @@
-module TestsOpenEmptyCells
+module ``Func recalculateField``
 
 open NUnit.Framework
 open FsUnit
@@ -10,11 +10,12 @@ let openedCell = fun c -> c.state = Opened
 let closedCell = fun c -> c.state = Closed
 
 [<Test>]
-let ``Open any position in field without mines should open all field`` () =
+let ``should open all field when open any position in field without mines `` () =
     let open' pos =
       let startPos = {x = 0; y = 0}
       let f = generateRandomField startPos {testField with mines = 0 } id
-      openEmptyCellsAround f pos
+      let newField = recalculateField pos f
+      newField.cells
     
     let shouldOpenedAllField cells = should haveLength (testField.width * testField.height) cells
     
@@ -28,23 +29,25 @@ let ``Open any position in field without mines should open all field`` () =
     open' {x = 4; y = 7} |> List.filter openedCell |> shouldOpenedAllField
 
 [<Test>]
-let ``Open position near closed cell with bomb should open only one cell`` () =
+let ``should open only one cell when open position near closed cell with bomb`` () =
     let startPos = {x = 7; y = 7}
     let f = generateRandomField startPos {testField with mines = 1 } (fun l -> [0])
     let positionForOpen = {x = 1; y = 1}
-    let resultCells = openEmptyCellsAround f positionForOpen 
+    let resultCells = (recalculateField positionForOpen f).cells 
     
     resultCells |> List.filter openedCell |> should haveLength 1
     resultCells |> List.filter openedCell |> List.head |> position |> should equal positionForOpen
     resultCells |> List.filter closedCell |> should haveLength (testField.Size - 1)
 
-let ``Open position near marked as bomb cell should open only one cell`` () =
+[<Test>]
+let ``should open all field with one bomb when cell with bomb marked as bomb correctly`` () =
     let startPos = {x = 7; y = 7}
-    let f = generateRandomField startPos {testField with mines = 1 } (fun l -> [0])
-    let positionForOpen = {x = 1; y = 1}
-    let resultCells = openEmptyCellsAround f positionForOpen 
+    let bombPos = {x = 1; y = 1}
+    let positionForOpen = {x = 1; y = 0}
+    let f1 = generateRandomField startPos {testField with mines = 1 } (fun l -> [testField.Linear bombPos])
+    let f1AfterChange = changeCellState f1 bombPos MarkAsBomb
+    let resultCells = (recalculateField positionForOpen f1AfterChange).cells
     
-    resultCells |> List.filter openedCell |> should haveLength 1
-    resultCells |> List.filter openedCell |> List.head |> position |> should equal positionForOpen
-    resultCells |> List.filter closedCell |> should haveLength (testField.Size - 1)
+    resultCells |> List.filter openedCell |> should haveLength (testField.Size - 1)
+    resultCells |> List.filter (fun c -> c.state = MarkAsBomb) |> should haveLength 1
     
