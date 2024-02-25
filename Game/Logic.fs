@@ -60,7 +60,7 @@ let recalculateField pos field =
  
   let cell = field.MustCell pos
   let processedCells = match cell.state with
-                       | Closed | MarkAsBomb -> []
+                       | Closed | MarkAsBomb | MarkAsProbablyBomb -> []
                        | _ -> openCells [cell] [] 
   
   let applyStatesFromProcessedCells c =

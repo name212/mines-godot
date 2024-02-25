@@ -210,3 +210,62 @@ let ``should not open any cells when cell marked as bomb`` () =
     resultCells.cells
     |> List.filter markedAsBombCell
     |> should haveLength 1
+
+[<Test>]    
+let ``should open not open cells when cells marked as probably bomb`` () =
+    let startPosition = {x = 1; y = 1}
+    let resultCells = changeCellState startPosition Opened testField2 
+                      |> recalculateField startPosition
+                      |> changeCellState { x = 3; y = 0} MarkAsProbablyBomb
+                      |> recalculateField { x = 3; y = 0 }
+                      |> changeCellState { x = 3; y = 1 } Opened
+                      |> recalculateField { x = 3; y = 1 }
+    
+    let inOpened = in' firstStepOpened
+    let notInOpened = notIn firstStepOpened    
+    
+    resultCells.cells
+    |> List.filter inOpened
+    |> List.filter openedCell
+    |> should haveLength (firstStepOpened.Length)
+    
+    resultCells.cells
+    |> List.filter notInOpened
+    |> List.filter closedCell
+    |> should haveLength (resultCells.game.Size - firstStepOpened.Length - 1)
+    
+    resultCells.cells
+    |> List.filter (fun c -> c.state = MarkAsProbablyBomb)
+    |> should haveLength 1
+
+[<Test>]    
+let ``should open nearly cells for marked as bomb`` () =
+    let secondOpenedCells = firstStepOpened @ [
+        {x = 4; y = 0}
+        {x = 4; y = 1}
+        {x = 4; y = 2}
+    ]
+    let startPosition = {x = 1; y = 1}
+    let resultCells = changeCellState startPosition Opened testField2 
+                      |> recalculateField startPosition
+                      |> changeCellState { x = 3; y = 0} MarkAsBomb
+                      |> recalculateField { x = 3; y = 0 }
+                      |> changeCellState { x = 3; y = 1 } Opened
+                      |> recalculateField { x = 3; y = 1 }
+    
+    let inOpened = in' firstStepOpened
+    let notInOpened = notIn firstStepOpened    
+    
+    resultCells.cells
+    |> List.filter inOpened
+    |> List.filter openedCell
+    |> should haveLength (secondOpenedCells.Length)
+    
+    resultCells.cells
+    |> List.filter notInOpened
+    |> List.filter closedCell
+    |> should haveLength (resultCells.game.Size - secondOpenedCells.Length - 1)
+    
+    resultCells.cells
+    |> List.filter (fun c -> c.state = MarkAsBomb)
+    |> should haveLength 1
