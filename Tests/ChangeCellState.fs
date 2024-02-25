@@ -13,7 +13,7 @@ let testMinesField = generateRandomField startPosition field (fun _ -> [field.Li
 [<Test>]
 let ``should set provided cell state for provided position`` () =
     (testMinesField.MustCell startPosition).state |> should equal Closed
-    let resultField = changeCellState testMinesField startPosition Opened
+    let resultField = changeCellState startPosition Opened testMinesField
     (resultField.MustCell startPosition).state |> should equal Opened
     resultField.cells
     |> List.filter (fun c -> c.pos <> startPosition)

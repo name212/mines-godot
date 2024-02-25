@@ -59,17 +59,19 @@ let recalculateField pos field =
     | h :: t -> openCells ((processCell h) @ t) ([{h with state = Opened}] @ processedCells)
  
   let cell = field.MustCell pos
-  let processedCells = openCells [cell] []
+  let processedCells = match cell.state with
+                       | Closed | MarkAsBomb -> []
+                       | _ -> openCells [cell] [] 
   
-  let statesFromProcessedCells c =
+  let applyStatesFromProcessedCells c =
     match List.tryFind (fun cc -> cc.pos = c.pos) processedCells with
     | Some(x) -> x
     | None -> c
   
-  let finalCells = List.map statesFromProcessedCells field.cells
+  let finalCells = List.map applyStatesFromProcessedCells field.cells
   {game = field.game; cells = finalCells }
 
-let changeCellState field pos newState =
+let changeCellState pos newState field =
   let buildNewField =
     let changeStateForActedCell c = 
       match pos <> c.pos with
@@ -141,7 +143,7 @@ let gameLoop (game: Field) (controller: GameController) =
     failwith "Incorrect position"
 
   let mutable field = generateRandomField startPosition game Utils.shuffle
-  field <- changeCellState field startPosition Opened |> recalculateField startPosition
+  field <- changeCellState startPosition Opened field |> recalculateField startPosition
   
   seq {
     while true do
@@ -153,7 +155,7 @@ let gameLoop (game: Field) (controller: GameController) =
                      | Open -> Opened
                      | Mark -> markToState field nextPosition
        
-      field <- changeCellState field nextPosition newState |> recalculateField nextPosition
+      field <- changeCellState nextPosition newState field |> recalculateField nextPosition
 
       match calcGameState field with
       | Lose -> lose field; yield None

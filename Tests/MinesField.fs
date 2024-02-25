@@ -13,7 +13,7 @@ let cellPos p =
     (testMinesField.MustCell p).pos
 
 [<Test>]
-let ``Should calculate correct size`` () =
+let ``should calculate correct size`` () =
     testMinesField.game.Size |> should equal 80
     
 [<Test>]
