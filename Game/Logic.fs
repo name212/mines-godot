@@ -1,6 +1,8 @@
 module internal Logic
 
 open System.Runtime.CompilerServices
+open System.Collections.Generic
+open Microsoft.Extensions.Logging
 open Types
 
 [<assembly: InternalsVisibleTo("Tests")>]
@@ -29,39 +31,54 @@ let cellsAround field pos: Cell list =
 
 let position c =
   c.pos
-
-let recalculateField pos field =
-  let processCell cell =
-    let notOpened = cellsAround field cell.pos |> List.filter (fun c -> c.state <> Opened)
-    let markedAsProbably = List.filter (fun c -> c.state = MarkAsProbablyBomb) notOpened
-    if markedAsProbably.Length = 0 then
-      let markedAsBombs = List.filter (fun c -> c.state = MarkAsBomb) notOpened
-      if markedAsBombs.Length = cell.bombsAround then
-        List.filter (fun c -> c.state <> MarkAsBomb && c.state <> MarkAsProbablyBomb) notOpened
-      else
-        []
-    else  
-     []
-      
-  let rec openCells cellsForProcess processedCells =
+  
+let recalculateField pos (field: MinesField) =
+  let cellProcessor (cellsForProcess: Cell list) (processedCells: Cell list) =
+    let processCell = cellsForProcess.Head
+    let cellsAround = cellsAround field processCell.pos
     let notProcessed cell =
       match List.tryFind (fun c -> c.pos = cell.pos) processedCells with
       | Some(_) -> false
       | None -> true
+      
+    let open' cell =
+      {cell with state = Opened}
     
     let positionHash c = c.pos.x * 10000 + c.pos.y * 1000000
       
-    let cells = cellsForProcess
-                |> List.distinctBy positionHash
-                |> List.filter notProcessed
-    match cells with
+    let notOpenedCells = cellsAround
+                         |> List.distinctBy positionHash
+                         |> List.filter notProcessed
+                         |> List.filter (fun c -> c.state <> Opened)
+    let markedAsBombs = notOpenedCells |> List.filter (fun c -> c.state = MarkAsBomb)
+    let incorrectMarked = markedAsBombs |> List.filter (fun c -> not c.hasBomb)
+    
+    if incorrectMarked.Length = 0 then
+      if markedAsBombs.Length <> processCell.bombsAround then
+        // not all marked, open current cell and return
+        ([], [open' processCell] @ processedCells)
+      else
+        // all right, open not opened cells and add to process all empty cells
+        let openedCells = notOpenedCells
+                           |> List.filter (fun c -> c.state <> MarkAsBomb)
+                           |> List.map open'
+        let emptyCells = openedCells |> List.filter (fun c -> c.bombsAround = 0)
+        let toAddForProcessed = openedCells |> List.except emptyCells
+        (emptyCells @ cellsForProcess.Tail, [open' processCell] @ toAddForProcessed @ processedCells )
+    else
+      // have none bomb cell marked as bomb open all cells for finish game (cells with bomb will be opened)
+      let openedCells = notOpenedCells |> List.map open'
+      ([], openedCells @ processedCells)
+    
+  let rec actor (cellsForProcess: Cell list, processedCells: Cell list) =
+    match cellsForProcess with
     | [] -> processedCells
-    | h :: t -> openCells ((processCell h) @ t) ([{h with state = Opened}] @ processedCells)
- 
+    | l -> actor (cellProcessor l processedCells)
+    
   let cell = field.MustCell pos
   let processedCells = match cell.state with
                        | Closed | MarkAsBomb | MarkAsProbablyBomb -> []
-                       | _ -> openCells [cell] [] 
+                       | _ -> actor ([cell], [])
   
   let applyStatesFromProcessedCells c =
     match List.tryFind (fun cc -> cc.pos = c.pos) processedCells with
@@ -117,6 +134,30 @@ let markToState (field: MinesField) position =
   | MarkAsProbablyBomb -> Closed
   | Opened -> Opened
 
+
+let logField (field: MinesField) (logger: ILogger) =
+    let printOpened c =
+      if c.hasBomb then
+        "*"
+      else
+        if c.bombsAround = 0 then
+          "_"
+        else
+          c.bombsAround.ToString()
+    let mutable s = [] 
+    for y in [ 0 .. field.game.height - 1] do
+      let arr = new List<string>()
+      for x in [0 .. field.game.width - 1] do
+        let cell = field.MustCell {x = x; y = y}
+        let sym = match cell.state with
+                  | Opened -> printOpened cell
+                  | Closed -> "#"
+                  | MarkAsBomb -> "!"
+                  | MarkAsProbablyBomb -> "?"
+        arr.Add sym
+      s <- s @ [String.concat " " arr]
+    
+    logger.LogDebug (String.concat "\n" s)    
 let gameLoop (game: Field) (controller: GameController) =
   let calcGameState f =
     let openedCells = List.filter (fun c -> c.state = Opened) f.cells

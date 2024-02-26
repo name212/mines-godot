@@ -1,5 +1,6 @@
 module ``Func recalculateField``
 
+open Microsoft.Extensions.Logging
 open NUnit.Framework
 open FsUnit
 open Logic
@@ -41,18 +42,20 @@ let ``should open only one cell when open position near closed cell with bomb`` 
     resultField.cells |> List.filter closedCell |> should haveLength (testField.Size - 1)
 
 [<Test>]
-let ``should open all field with one bomb when cell with bomb marked as bomb correctly`` () =
-    let startPos = {x = 7; y = 7}
-    let bombPos = {x = 1; y = 1}
-    let positionForOpen = {x = 1; y = 0}
+let ``should open all field - 2 (marked and ) with one bomb when cell with bomb marked as bomb correctly`` () =
+    let startPos = {x = 4; y = 4}
+    let bombPos = {x = 1; y = 4}
+    let positionForOpen = {x = 4; y = 4}
     let f1 = generateRandomField startPos {testField with mines = 1 } (fun l -> [testField.Linear bombPos])
     let resultField = changeCellState bombPos MarkAsBomb f1
                       |> recalculateField bombPos
                       |> changeCellState positionForOpen Opened
                       |> recalculateField positionForOpen
 
-    resultField.cells |> List.filter openedCell |> should haveLength (testField.Size - 1)
+    resultField.cells |> List.filter openedCell |> should haveLength (testField.Size - 2)
     resultField.cells |> List.filter (fun c -> c.state = MarkAsBomb) |> should haveLength 1
+    (resultField.MustCell {x = 0; y = 4}).state |> should equal Closed
+    
  
  // next tests operate with real field
  // _ _ 1 v v v v v      _ _ 1 * 1 v v v      _ _ 1 * o 1 v v     _ _ 1 * o 1 v v     _ _ 1 * 1 1 v v     _ _ 1 * 1 1 v v
@@ -252,9 +255,9 @@ let ``should open nearly cells for marked as bomb`` () =
                       |> recalculateField { x = 3; y = 0 }
                       |> changeCellState { x = 3; y = 1 } Opened
                       |> recalculateField { x = 3; y = 1 }
-    
-    let inOpened = in' firstStepOpened
-    let notInOpened = notIn firstStepOpened    
+                      
+    let inOpened = in' secondOpenedCells
+    let notInOpened = notIn secondOpenedCells    
     
     resultCells.cells
     |> List.filter inOpened
