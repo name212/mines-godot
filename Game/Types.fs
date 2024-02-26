@@ -23,7 +23,7 @@ type MinesField = {game: Field; cells: Cell list} with
   member f.MustCell p = f.cells.Item (f.game.Linear p)
 end
 
-type GameState = Win | Lose | InGame
+type GameState = Win | Lose | InGame | Paused
 
 type GameAction = Open | Mark
 

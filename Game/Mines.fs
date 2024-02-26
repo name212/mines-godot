@@ -1,4 +1,106 @@
 namespace mines
 
+open System
 open Types
-open Microsoft.Extensions.Logging
+open System.Collections.Generic
+
+type NowFunc = unit -> DateTime
+
+type Mines(width, height, bombs, now: NowFunc) =
+    let game = {width = width; height = height; mines = bombs }
+    let mutable field: MinesField option = None
+    
+    let mutable duration = 0.0
+    let mutable lastPause: DateTime option = None
+    let mutable gameState: GameState = InGame
+    
+    let open' pos state =
+        let f = Logic.changeCellState pos state field.Value |> Logic.recalculateField pos
+        gameState <- Logic.calcGameState f
+        field <- Some(f)
+    
+    let startGame pos =
+        if game.isValid pos then
+            failwith "Incorrect position"
+        field <- Some(Logic.generateRandomField pos game Utils.shuffle)
+        lastPause <- Some(now())
+        duration <- 0.0
+        open' pos Opened
+        
+    let resume nowTime =
+        lastPause <- Some(nowTime)
+        gameState <- InGame
+        
+    let totalDuration nowTime =
+        (nowTime - lastPause.Value).TotalSeconds + duration
+        
+    let pause nowTime =
+        duration <- totalDuration nowTime
+        lastPause <- None
+        gameState <- Paused
+    
+    member this.Field with get() = field
+    
+        
+    member this.State with get() = gameState
+    
+    member this.Duration with get() =
+        match lastPause with
+        | None -> duration
+        | Some _ -> totalDuration (now())
+    
+    member this.Open pos =
+        match gameState with
+        | Win | Lose -> ()
+        | _ -> match field with
+               | None -> startGame pos
+               | Some _ -> open' pos Opened
+    
+    member this.Mark pos =
+        match gameState with
+        | Win | Lose -> ()
+        | _ -> match field with
+               | None -> ()
+               | Some f ->  open' pos (Logic.markToState f pos)
+        
+    member this.PauseOrResume () =
+        let pauseOrResume =
+            let nowTime = now()
+            if field.IsSome then
+                match lastPause with
+                | None -> resume nowTime
+                | Some _ -> pause nowTime
+        
+        match gameState with
+        | Win | Lose -> ()
+        | _ -> pauseOrResume
+    
+module Debug =
+    let logField (field: MinesField) =
+        let printOpened c =
+          if c.hasBomb then
+            "*"
+          else
+            if c.bombsAround = 0 then
+              "_"
+            else
+              c.bombsAround.ToString()
+        let mutable s = [
+           "  |" + ([0 .. field.game.width - 1] |> List.map (fun i -> i.ToString()) |> String.concat " ")
+        ] 
+        for y in [ 0 .. field.game.height - 1] do
+          let arr = new List<string>()
+          for x in [0 .. field.game.width - 1] do
+            let cell = field.MustCell {x = x; y = y}
+            let sym = match cell.state with
+                      | Opened -> printOpened cell
+                      | Closed -> "#"
+                      | MarkAsBomb -> "!"
+                      | MarkAsProbablyBomb -> "?"
+            arr.Add sym
+          s <- s @ [
+              y.ToString() + "|" + (String.concat " " arr)
+          ]
+        
+        String.concat "\n" s
+        

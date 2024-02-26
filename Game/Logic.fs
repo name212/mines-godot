@@ -1,8 +1,6 @@
 module internal Logic
 
 open System.Runtime.CompilerServices
-open System.Collections.Generic
-open Microsoft.Extensions.Logging
 open Types
 
 [<assembly: InternalsVisibleTo("Tests")>]
@@ -134,74 +132,11 @@ let markToState (field: MinesField) position =
   | MarkAsProbablyBomb -> Closed
   | Opened -> Opened
 
-
-let logField (field: MinesField) (logger: ILogger) =
-    let printOpened c =
-      if c.hasBomb then
-        "*"
-      else
-        if c.bombsAround = 0 then
-          "_"
-        else
-          c.bombsAround.ToString()
-    let mutable s = [] 
-    for y in [ 0 .. field.game.height - 1] do
-      let arr = new List<string>()
-      for x in [0 .. field.game.width - 1] do
-        let cell = field.MustCell {x = x; y = y}
-        let sym = match cell.state with
-                  | Opened -> printOpened cell
-                  | Closed -> "#"
-                  | MarkAsBomb -> "!"
-                  | MarkAsProbablyBomb -> "?"
-        arr.Add sym
-      s <- s @ [String.concat " " arr]
-    
-    logger.LogDebug (String.concat "\n" s)    
-let gameLoop (game: Field) (controller: GameController) =
-  let calcGameState f =
-    let openedCells = List.filter (fun c -> c.state = Opened) f.cells
-    let hasOpenedBomb = (List.filter (_.hasBomb) openedCells).Length > 0
-    match hasOpenedBomb with
-    | true ->  Lose
-    | false -> match f.game.Size - openedCells.Length = f.game.mines with
-               | true -> Win
-               | false -> InGame
-  
-  let lose field =
-    controller.UpdateField field
-    controller.Lose()
-    
-  let win field =
-    controller.UpdateField field
-    controller.Win()
-  
-  let continueGame field =
-    controller.UpdateField field
-               
-  let startPosition, _ = controller.WaitNextStep()
-  if game.isValid startPosition then
-    failwith "Incorrect position"
-
-  let mutable field = generateRandomField startPosition game Utils.shuffle
-  field <- changeCellState startPosition Opened field |> recalculateField startPosition
-  
-  seq {
-    while true do
-      let nextPosition, nextAction = controller.WaitNextStep()
-      if game.isValid nextPosition then
-        failwith "Incorrect position"
-
-      let newState = match nextAction with
-                     | Open -> Opened
-                     | Mark -> markToState field nextPosition
-       
-      field <- changeCellState nextPosition newState field |> recalculateField nextPosition
-
-      match calcGameState field with
-      | Lose -> lose field; yield None
-      | Win -> win field; yield None
-      | InGame -> continueGame field; yield Some()
-
-  } |> Seq.toList |> ignore
-
+let calcGameState f =
+  let openedCells = List.filter (fun c -> c.state = Opened) f.cells
+  let hasOpenedBomb = (List.filter (_.hasBomb) openedCells).Length > 0
+  match hasOpenedBomb with
+  | true ->  Lose
+  | false -> match f.game.Size - openedCells.Length = f.game.mines with
+             | true -> Win
+             | false -> InGame
