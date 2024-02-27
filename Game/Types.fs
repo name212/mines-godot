@@ -26,9 +26,3 @@ end
 type GameState = Win | Lose | InGame | Paused
 
 type GameAction = Open | Mark
-
-type GameController =
-  abstract WaitNextStep : unit -> Position * GameAction
-  abstract Lose: unit -> unit
-  abstract Win: unit -> unit
-  abstract UpdateField: MinesField -> unit

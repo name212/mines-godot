@@ -4,9 +4,9 @@ open System
 open Types
 open System.Collections.Generic
 
-type NowFunc = unit -> DateTime
+type public NowFunc = unit -> DateTime
 
-type Mines(width, height, bombs, now: NowFunc) =
+type public Mines(width, height, bombs, now: NowFunc) =
     let game = {width = width; height = height; mines = bombs }
     let mutable field: MinesField option = None
     
@@ -39,9 +39,8 @@ type Mines(width, height, bombs, now: NowFunc) =
         lastPause <- None
         gameState <- Paused
     
+    member this.Game = game
     member this.Field with get() = field
-    
-        
     member this.State with get() = gameState
     
     member this.Duration with get() =
@@ -75,7 +74,7 @@ type Mines(width, height, bombs, now: NowFunc) =
         | Win | Lose -> ()
         | _ -> pauseOrResume
     
-module Debug =
+module public Debug =
     let logField (field: MinesField) =
         let printOpened c =
           if c.hasBomb then
@@ -99,7 +98,7 @@ module Debug =
                       | MarkAsProbablyBomb -> "?"
             arr.Add sym
           s <- s @ [
-              y.ToString() + "|" + (String.concat " " arr)
+              y.ToString() + "|" + (String.concat "  " arr)
           ]
         
         String.concat "\n" s
