@@ -17,18 +17,29 @@ let main argv =
             while true do
                 printf "Enter position x y: "
                 let input = Console.ReadLine()
-                let posX = input.Split " "
-                let x = Int32.Parse posX[0]
-                let y = Int32.Parse posX[1]
-                let curPos = {x = x; y = y}
-                if game.Game.isValid curPos then
-                    game.Open curPos
-                    match game.State with
-                    | Win -> printfn $"WIN! Time: {game.Duration}"
-                    | Lose -> printfn "Lose! :-("
-                    | _ -> ()
-                else
-                    yield Some
+                let splitInput = input.Split " " |> List.ofArray
+                let pos, action = match splitInput with
+                                    | [_] -> None, game.Open
+                                    | [x; y] -> Some(x, y), game.Open
+                                    | [x; y; _] -> Some(x, y), game.Mark
+                                    | _ -> None, game.Open
+                if pos.IsSome then
+                    let xStr, yStr = pos.Value
+                    let parsedPos = try
+                                        let x = Int32.Parse xStr
+                                        let y = Int32.Parse yStr
+                                        {x = x; y = y}
+                                    with
+                                    | ex -> {x = -1; y = -1} 
+                    if game.Game.isValid parsedPos then
+                        action parsedPos
+                        match game.State with
+                        | Win -> printfn $"WIN! Time: {game.Duration} s"; yield None
+                        | Lose -> printfn "Lose! :-("; yield None
+                        | _ -> printfn $"%s{Debug.logField game.Field.Value}" ; yield Some()
+                    else
+                        printfn "Incorrect position"
+                        yield Some()
                     
-        } |> Seq.toList |> ignore
+        } |> Seq.takeWhile (_.IsSome) |> Seq.toList |> ignore
         0

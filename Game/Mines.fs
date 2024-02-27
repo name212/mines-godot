@@ -20,7 +20,7 @@ type public Mines(width, height, bombs, now: NowFunc) =
         field <- Some(f)
     
     let startGame pos =
-        if game.isValid pos then
+        if not (game.isValid pos) then
             failwith "Incorrect position"
         field <- Some(Logic.generateRandomField pos game Utils.shuffle)
         lastPause <- Some(now())
@@ -84,8 +84,10 @@ module public Debug =
               "_"
             else
               c.bombsAround.ToString()
+        let header = "  | " + ([0 .. field.game.width - 1] |> List.map (fun i -> i.ToString()) |> String.concat "  ")
         let mutable s = [
-           "  |" + ([0 .. field.game.width - 1] |> List.map (fun i -> i.ToString()) |> String.concat " ")
+           header;
+           [1 .. header.Length] |> List.map (fun _ -> "-") |> String.concat ""   
         ] 
         for y in [ 0 .. field.game.height - 1] do
           let arr = new List<string>()
@@ -98,7 +100,7 @@ module public Debug =
                       | MarkAsProbablyBomb -> "?"
             arr.Add sym
           s <- s @ [
-              y.ToString() + "|" + (String.concat "  " arr)
+              y.ToString() + " | " + (String.concat "  " arr)
           ]
         
         String.concat "\n" s
