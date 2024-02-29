@@ -36,6 +36,8 @@ let ``should open only one cell when open position near closed cell with bomb`` 
     let f = generateRandomField startPos {testField with mines = 1 } (fun l -> [0])
     let positionForOpen = {x = 1; y = 1}
     let resultField = changeCellState positionForOpen Opened f |> recalculateField positionForOpen 
+    let position cell =
+        cell.pos
     
     resultField.cells |> List.filter openedCell |> should haveLength 1
     resultField.cells |> List.filter openedCell |> List.head |> position |> should equal positionForOpen
