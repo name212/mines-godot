@@ -27,9 +27,6 @@ let cellsAround field pos: Cell list =
   let positions = positionsAround pos field.game
   List.map field.MustCell positions
 
-let position c =
-  c.pos
-  
 let recalculateField pos (field: MinesField) =
   let cellProcessor (cellsForProcess: Cell list) (processedCells: Cell list) =
     let processCell = cellsForProcess.Head
