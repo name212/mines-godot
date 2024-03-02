@@ -1,0 +1,54 @@
+[gd_scene load_steps=2 format=3 uid="uid://dy1vxuj6eigbr"]
+
+[ext_resource type="Script" path="res://MainScene.cs" id="1_gm2nr"]
+
+[node name="MainScene" type="Node2D"]
+script = ExtResource("1_gm2nr")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+offset_right = 400.0
+offset_bottom = 400.0
+
+[node name="GridContainer" type="GridContainer" parent="CenterContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="WidthLabel" type="Label" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+text = "Width"
+
+[node name="Width" type="SpinBox" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+min_value = 8.0
+max_value = 99.0
+value = 8.0
+
+[node name="HeightLabel" type="Label" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+text = "Height"
+
+[node name="Height" type="SpinBox" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+min_value = 8.0
+max_value = 99.0
+value = 8.0
+
+[node name="MinesLabel" type="Label" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+text = "Mines"
+
+[node name="Mines" type="SpinBox" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 9000.0
+value = 10.0
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+
+[node name="StartBtn" type="Button" parent="CenterContainer/GridContainer"]
+layout_mode = 2
+action_mode = 0
+text = "Start"
+
+[connection signal="pressed" from="CenterContainer/GridContainer/StartBtn" to="." method="_on_start_btn_pressed"]
