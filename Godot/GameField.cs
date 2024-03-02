@@ -1,9 +1,8 @@
 using Godot;
 using System;
 
-public partial class MainScene : Node2D
+public partial class GameField : Node2D
 {
-	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -16,12 +15,10 @@ public partial class MainScene : Node2D
 	{
 	}
 	
-
-	private void _on_start_btn_pressed()
+	private void _on_new_game_button_pressed()
 	{
-		GD.Print("_on_start_btn_pressed");
-		GetTree().ChangeSceneToFile("res://GameField.tscn");
+		GD.Print("_on_new_game_button_pressed");
+		GetTree().ChangeSceneToFile("res://MainScene.tscn");
 	}
-	
 }
 
