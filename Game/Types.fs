@@ -21,6 +21,7 @@ end
 type MinesField = {game: Field; cells: Cell list} with
   member f.Cell p = List.tryItem (f.game.Linear p) f.cells
   member f.MustCell p = f.cells.Item (f.game.Linear p)
+  member f.MarkedAsBombsCount () = (f.cells |> List.filter (fun c -> c.state = MarkAsBomb)).Length
 end
 
 type GameState = Win | Lose | InGame | Paused

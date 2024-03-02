@@ -8,6 +8,7 @@ type public NowFunc = unit -> DateTime
 
 type public Mines(width, height, bombs, now: NowFunc) =
     let game = {width = width; height = height; mines = bombs }
+    let EmptyField = Logic.generateEmptyField game
     let mutable field: MinesField option = None
     
     let mutable duration = 0.0
@@ -40,7 +41,11 @@ type public Mines(width, height, bombs, now: NowFunc) =
         gameState <- Paused
     
     member this.Game = game
-    member this.Field with get() = field
+    member this.Field with get() =
+        match field with
+        | None -> EmptyField
+        | Some(f) -> f
+
     member this.State with get() = gameState
     
     member this.Duration with get() =
