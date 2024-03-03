@@ -6,7 +6,7 @@
 script = ExtResource("1_k4geo")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
-custom_minimum_size = Vector2(400, 400)
+custom_minimum_size = Vector2(800, 600)
 offset_right = 40.0
 offset_bottom = 40.0
 
