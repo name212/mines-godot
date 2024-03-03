@@ -6,7 +6,16 @@ open System.Collections.Generic
 
 type public NowFunc = unit -> DateTime
 
-type public Mines(width, height, bombs, now: NowFunc) =
+type public Timer = interface
+    abstract member Now : unit -> DateTime
+end
+
+type public StdTimer() =
+    interface Timer with
+        member this.Now() = DateTime.Now 
+    end
+
+type public Mines(width, height, bombs, timer: Timer) =
     let game = {width = width; height = height; mines = bombs }
     let EmptyField = Logic.generateEmptyField game
     let mutable field: MinesField option = None
@@ -24,7 +33,7 @@ type public Mines(width, height, bombs, now: NowFunc) =
         if not (game.isValid pos) then
             failwith "Incorrect position"
         field <- Some(Logic.generateRandomField pos game Utils.shuffle)
-        lastPause <- Some(now())
+        lastPause <- Some(timer.Now())
         duration <- 0.0
         open' pos Opened
         
@@ -51,7 +60,7 @@ type public Mines(width, height, bombs, now: NowFunc) =
     member this.Duration with get() =
         match lastPause with
         | None -> duration
-        | Some _ -> totalDuration (now())
+        | Some _ -> totalDuration (timer.Now())
     
     member this.Open pos =
         match gameState with
@@ -69,7 +78,7 @@ type public Mines(width, height, bombs, now: NowFunc) =
         
     member this.PauseOrResume () =
         let pauseOrResume =
-            let nowTime = now()
+            let nowTime = timer.Now()
             if field.IsSome then
                 match lastPause with
                 | None -> resume nowTime

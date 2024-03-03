@@ -12,7 +12,7 @@ let main argv =
         let width = Int32.Parse widthStr
         let height = Int32.Parse heightStr
         let bombs = Int32.Parse minesStr
-        let game = Mines(width, height, bombs, fun () -> DateTime.UtcNow)
+        let game = Mines(width, height, bombs, StdTimer())
         seq {
             while true do
                 printf "Enter position x y: "
@@ -36,7 +36,7 @@ let main argv =
                         match game.State with
                         | Win -> printfn $"WIN! Time: {game.Duration} s"; yield None
                         | Lose -> printfn "Lose! :-("; yield None
-                        | _ -> printfn $"%s{Debug.logField game.Field.Value}" ; yield Some()
+                        | _ -> printfn $"%s{Debug.logField game.Field}" ; yield Some()
                     else
                         printfn "Incorrect position"
                         yield Some()

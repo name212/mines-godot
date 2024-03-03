@@ -33,17 +33,17 @@ layout_mode = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="MinesMarkedLabel" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
 [node name="Label2" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "/"
 
-[node name="Label3" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="MinesCountLabel" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="TimerLabel" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="MarginContainer2" type="MarginContainer" parent="ScrollContainer/VBoxContainer/HBoxContainer"]
