@@ -3,26 +3,34 @@ using mines;
 
 public partial class Game : Node
 {
+	private const string GameNodePath = "/root/Game";
+
+	public static Game GetGame(Node screen)
+	{
+		return screen.GetNode<Game>(GameNodePath);
+	}
+	
 	private Mines _gameField;
 
 	// using for indicate re-render field in UI
-	public Types.MinesField CurrentField;
-
 	public void NewGame(int width, int height, int mines)
 	{
 		_gameField = new Mines(width, height, mines, new StdTimer());
 	}
 
+	public Types.MinesField Field()
+	{
+		return _gameField?.Field;
+	}
+
 	public void Open(int x, int y)
 	{
 		_gameField?.Open(new Types.Position(x, y));
-		CurrentField = _gameField?.Field;
 	}
 
 	public void Mark(int x, int y)
 	{
 		_gameField?.Mark(new Types.Position(x, y));
-		CurrentField = _gameField?.Field;
 	}
 
 	public int MarkedAsBombCount()
