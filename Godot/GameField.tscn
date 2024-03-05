@@ -5,55 +5,52 @@
 [node name="GameField" type="Node2D"]
 script = ExtResource("1_k4geo")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
-clip_contents = false
-custom_minimum_size = Vector2(800, 600)
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 6
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 381.0
+offset_bottom = 50.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 4
 alignment = 1
 
-[node name="NewGameButton" type="Button" parent="ScrollContainer/VBoxContainer/HBoxContainer"]
+[node name="NewGameButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "New Game"
 
-[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(100, 0)
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer/VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="MinesMarkedLabel" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="MinesMarkedLabel" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "/"
 
-[node name="MinesCountLabel" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="MinesCountLabel" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="TimerLabel" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="TimerLabel" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="MarginContainer2" type="MarginContainer" parent="ScrollContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(100, 0)
+[node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 
-[node name="PauseButton" type="Button" parent="ScrollContainer/VBoxContainer/HBoxContainer"]
+[node name="PauseButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Pause"
 
-[connection signal="pressed" from="ScrollContainer/VBoxContainer/HBoxContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/PauseButton" to="." method="_on_pause_button_pressed"]

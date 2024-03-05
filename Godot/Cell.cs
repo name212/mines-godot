@@ -64,12 +64,11 @@ public partial class Cell(Types.Cell c) : Control
 				break;
 		}
 
-		cld.Size = MinSize;
+		 cld.Size = MinSize;
 		
 		cld.Connect("gui_input", Callable.From<InputEvent>(OnInput));
 		AddChild(cld);
 	}
-
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{

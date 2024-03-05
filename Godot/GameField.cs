@@ -3,8 +3,8 @@ using System;
 
 public partial class GameField : Node2D
 {
-	private const string LabelsContainerPath = "ScrollContainer/VBoxContainer/HBoxContainer/VBoxContainer";
-	private const string FieldContainerPath = "ScrollContainer/VBoxContainer";
+	private const string LabelsContainerPath = "VBoxContainer/HBoxContainer/VBoxContainer";
+	private const string FieldContainerPath = "VBoxContainer";
 
 	private int _curDuration = -1;
 	private int _curMinesCount = -1;
@@ -14,8 +14,6 @@ public partial class GameField : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		GetWindow().Size = new Vector2I(800, 800);
-		GetWindow().MinSize = new Vector2I(400, 400);
 	}
 
 	private void UpdateCounters(Game game)
@@ -69,8 +67,8 @@ public partial class GameField : Node2D
 		var fieldView = new GridContainer();
 		fieldView.Name = gridContainerName;
 		fieldView.Columns = settings.width;
-		fieldView.GrowHorizontal = Control.GrowDirection.Both;
-		
+		fieldView.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+
 		for (int pos = 0; pos < settings.Size; pos++)
 		{
 			var cell = field.Cell(pos);
@@ -79,7 +77,9 @@ public partial class GameField : Node2D
 			cellView.RightClick += HandleCellRightClick;
 			fieldView.AddChild(cellView);
 		}
-
+		
+		var minSize = fieldView.GetChild<Control>(0)._GetMinimumSize();
+		GetWindow().Size = new Vector2I((int)minSize.X * settings.width + settings.width * 5, (int) minSize.Y * settings.height + settings.height * 5 + 50);
 		const string fullPath = $"{FieldContainerPath}";
 		var fieldContainer = GetNode<VBoxContainer>(fullPath);
 		var oldFieldView = fieldContainer.GetNode<GridContainer>(gridContainerName);
@@ -105,6 +105,13 @@ public partial class GameField : Node2D
 		GD.Print("_on_new_game_button_pressed");
 		GetTree().ChangeSceneToFile("res://MainScene.tscn");
 	}
+	
+	private void _on_pause_button_pressed()
+	{
+		GD.Print("_on_new_game_button_pressed");
+		Game.GetGame(this).PauseOrResume();
+	}
+	
 	private void HandleCellLeftClick(int x, int y)
 	{
 		GD.Print($"HandleCellLeftClick ({x}; {y})");
@@ -116,6 +123,4 @@ public partial class GameField : Node2D
 		GD.Print($"HandleCellRightClick ({x}; {y})");
 		Game.GetGame(this).Mark(x, y);
 	}
-
 }
-
