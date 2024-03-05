@@ -8,7 +8,6 @@ public partial class Cell(Types.Cell c) : Control
 	private static readonly Texture2D MarkAsBombTxt = GD.Load<Texture2D>("res://assets/marked.png");
 	private static readonly Texture2D MarkAsProbablyBombTxt = GD.Load<Texture2D>("res://assets/probablyMarked.png");
 	private static readonly Texture2D BombTxt = GD.Load<Texture2D>("res://assets/mine.png");
-	private static readonly Texture2D ClosedCellTxt = GD.Load<Texture2D>("res://assets/rectangle-arrow.png");
 	
 	[Signal]
 	public delegate void LeftClickEventHandler(int x, int y);
@@ -23,7 +22,6 @@ public partial class Cell(Types.Cell c) : Control
 		{
 			case Types.CellState.Tags.Closed:
 				var b = new Button();
-				b.Icon = ClosedCellTxt;
 				cld = b;
 				break;
 			case Types.CellState.Tags.Opened:
