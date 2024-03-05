@@ -76,6 +76,7 @@ public partial class GameField : Node2D
 			var cell = field.Cell(pos);
 			var cellView = new Cell(cell);
 			cellView.LeftClick += HandleCellLeftClick;
+			cellView.RightClick += HandleCellRightClick;
 			fieldView.AddChild(cellView);
 		}
 
@@ -107,7 +108,14 @@ public partial class GameField : Node2D
 	private void HandleCellLeftClick(int x, int y)
 	{
 		GD.Print($"HandleCellLeftClick ({x}; {y})");
+		Game.GetGame(this).Open(x, y);
 	}
-	
+
+	private void HandleCellRightClick(int x, int y)
+	{
+		GD.Print($"HandleCellRightClick ({x}; {y})");
+		Game.GetGame(this).Mark(x, y);
+	}
+
 }
 

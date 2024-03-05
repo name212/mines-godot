@@ -7,7 +7,7 @@ public partial class Cell(Types.Cell c) : Control
 	private static readonly Vector2 MinSize = new Vector2(40, 40);
 	private static readonly Texture2D MarkAsBombTxt = GD.Load<Texture2D>("res://assets/marked.png");
 	private static readonly Texture2D MarkAsProbablyBombTxt = GD.Load<Texture2D>("res://assets/probablyMarked.png");
-	private static readonly Texture2D BombTxt = GD.Load<Texture2D>("res://assets/probablyMarked.png");
+	private static readonly Texture2D BombTxt = GD.Load<Texture2D>("res://assets/mine.png");
 	private static readonly Texture2D ClosedCellTxt = GD.Load<Texture2D>("res://assets/rectangle-arrow.png");
 	
 	[Signal]
@@ -22,13 +22,9 @@ public partial class Cell(Types.Cell c) : Control
 		switch (c.state.Tag)
 		{
 			case Types.CellState.Tags.Closed:
-				var btn = new TextureButton();
-				btn.IgnoreTextureSize = false;
-				btn.TextureNormal = ClosedCellTxt;
-				btn.TextureHover = ClosedCellTxt;
-				btn.TexturePressed = ClosedCellTxt;
-				btn.TextureFocused = ClosedCellTxt;
-				cld = btn;
+				var b = new Button();
+				b.Icon = ClosedCellTxt;
+				cld = b;
 				break;
 			case Types.CellState.Tags.Opened:
 				if (c.hasBomb)
@@ -41,6 +37,7 @@ public partial class Cell(Types.Cell c) : Control
 				} else if (c.bombsAround > 0)
 				{
 					var lbl = new Label();
+					lbl.MouseFilter = MouseFilterEnum.Pass;
 					lbl.Text = c.bombsAround.ToString();
 					lbl.HorizontalAlignment = HorizontalAlignment.Center;
 					lbl.VerticalAlignment = VerticalAlignment.Center;
@@ -87,22 +84,21 @@ public partial class Cell(Types.Cell c) : Control
 
 	private void OnInput(InputEvent e)
 	{
-		if (e.IsPressed())
+		if (!e.IsPressed()) return;
+		if (e is not InputEventMouseButton mouse) return;
+		switch (mouse.ButtonIndex)
 		{
-			if (e is InputEventMouseButton mouse)
-			{
-				switch (mouse.ButtonIndex)
-				{
-					case MouseButton.Left:
-						GD.Print($"Left pressed on cell {c.pos.x}x{c.pos.y}");
-						EmitSignal(SignalName.LeftClick, c.pos.x, c.pos.y);
-						break;
-					case MouseButton.Right:
-						GD.Print($"Right pressed on cell {c.pos.x}x{c.pos.y}");
-						EmitSignal(SignalName.RightClick, c.pos.x, c.pos.y);
-						break;
-				}
-			}
+			case MouseButton.Left:
+				GD.Print($"Left pressed on cell {c.pos.x}x{c.pos.y}");
+				EmitSignal(SignalName.LeftClick, c.pos.x, c.pos.y);
+				break;
+			case MouseButton.Right:
+				GD.Print($"Right pressed on cell {c.pos.x}x{c.pos.y}");
+				EmitSignal(SignalName.RightClick, c.pos.x, c.pos.y);
+				break;
+			default:
+				GD.Print($"Unknown mouse button pressed on cell {c.pos.x}x{c.pos.y}");
+				break;
 		}
 	}
 }

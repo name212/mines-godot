@@ -94,7 +94,10 @@ let changeCellState pos newState field =
     
   let cell = field.MustCell pos
   if cell.state <> newState then
-    buildNewField
+    if cell.state = MarkAsBomb && newState = Opened then
+      field
+    else
+      buildNewField
   else
     field
 

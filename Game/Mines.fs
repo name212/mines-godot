@@ -24,19 +24,6 @@ type public Mines(width, height, bombs, timer: Timer) =
     let mutable lastPause: DateTime option = None
     let mutable gameState: GameState = InGame
     
-    let open' pos state =
-        let f = Logic.changeCellState pos state field.Value |> Logic.recalculateField pos
-        gameState <- Logic.calcGameState f
-        field <- Some(f)
-    
-    let startGame pos =
-        if not (game.isValid pos) then
-            failwith "Incorrect position"
-        field <- Some(Logic.generateRandomField pos game Utils.shuffle)
-        lastPause <- Some(timer.Now())
-        duration <- 0.0
-        open' pos Opened
-        
     let resume nowTime =
         lastPause <- Some(nowTime)
         gameState <- InGame
@@ -48,6 +35,31 @@ type public Mines(width, height, bombs, timer: Timer) =
         duration <- totalDuration nowTime
         lastPause <- None
         gameState <- Paused
+    
+    let open' pos state =
+        let f = Logic.changeCellState pos state field.Value |> Logic.recalculateField pos
+        
+        let onWin t fld =
+            pause t
+            fld
+        let onLose t fld =
+            pause t
+            fld
+        
+        gameState <- Logic.calcGameState f
+        let t = timer.Now()
+        field <- match gameState with
+                 | Win -> onWin t (Some(f))
+                 | Lose ->  onLose t (Some(f))
+                 | _ -> Some(f)
+    
+    let startGame pos =
+        if not (game.isValid pos) then
+            failwith "Incorrect position"
+        field <- Some(Logic.generateRandomField pos game Utils.shuffle)
+        lastPause <- Some(timer.Now())
+        duration <- 0.0
+        open' pos Opened
     
     member this.Game = game
     member this.Field with get() =
