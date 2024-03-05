@@ -12,7 +12,6 @@ public partial class Game : Node
 	
 	private Mines _gameField;
 
-	// using for indicate re-render field in UI
 	public void NewGame(int width, int height, int mines)
 	{
 		_gameField = new Mines(width, height, mines, new StdTimer());
