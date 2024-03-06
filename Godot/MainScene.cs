@@ -5,6 +5,13 @@ public partial class MainScene : Node2D
 {
 	private const string InputsContainerPath = "MainContainer/InputContainer";
 
+	private Types.Field[] GamesSelected = new[]
+	{
+		new Types.Field(8, 8, 10),
+		new Types.Field(16, 16, 40),
+		new Types.Field(30, 16, 99),
+	};
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -34,5 +41,14 @@ public partial class MainScene : Node2D
 		GetTree().ChangeSceneToFile("res://GameField.tscn");
 	}
 	
+	private void _on_option_button_item_selected(long index)
+	{
+		var gm = GamesSelected[index];
+		
+		GetNode<SpinBox>($"{InputsContainerPath}/Width").Value = gm.width;
+		GetNode<SpinBox>($"{InputsContainerPath}/Height").Value = gm.height;
+		GetNode<SpinBox>($"{InputsContainerPath}/Mines").Value = gm.mines;
+	}
 }
+
 

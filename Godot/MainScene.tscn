@@ -43,12 +43,21 @@ min_value = 1.0
 max_value = 9000.0
 value = 10.0
 
-[node name="MarginContainer" type="MarginContainer" parent="MainContainer/InputContainer"]
+[node name="OptionButton" type="OptionButton" parent="MainContainer/InputContainer"]
 layout_mode = 2
+item_count = 3
+selected = 0
+popup/item_0/text = "8x8 (10)"
+popup/item_0/id = 0
+popup/item_1/text = "16x16 (40)"
+popup/item_1/id = 1
+popup/item_2/text = "30x16 (99)"
+popup/item_2/id = 2
 
 [node name="StartBtn" type="Button" parent="MainContainer/InputContainer"]
 layout_mode = 2
 action_mode = 0
 text = "Start"
 
+[connection signal="item_selected" from="MainContainer/InputContainer/OptionButton" to="." method="_on_option_button_item_selected"]
 [connection signal="pressed" from="MainContainer/InputContainer/StartBtn" to="." method="_on_start_btn_pressed"]
