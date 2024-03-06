@@ -4,7 +4,7 @@ using System;
 public partial class GameField : Node2D
 {
 	private const string LabelsContainerPath = "VBoxContainer/HBoxContainer/VBoxContainer";
-	private const string FieldContainerPath = "VBoxContainer";
+	private const string FieldContainerPath = "VBoxContainer/CenterContainer";
 
 	private int _curDuration = -1;
 	private int _curMinesCount = -1;
@@ -81,7 +81,7 @@ public partial class GameField : Node2D
 		var minSize = fieldView.GetChild<Control>(0)._GetMinimumSize();
 		GetWindow().Size = new Vector2I((int)minSize.X * settings.width + settings.width * 5, (int) minSize.Y * settings.height + settings.height * 5 + 50);
 		const string fullPath = $"{FieldContainerPath}";
-		var fieldContainer = GetNode<VBoxContainer>(fullPath);
+		var fieldContainer = GetNode<CenterContainer>(fullPath);
 		var oldFieldView = fieldContainer.GetNode<GridContainer>(gridContainerName);
 		if (oldFieldView != null)
 		{
