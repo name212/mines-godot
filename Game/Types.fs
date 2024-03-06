@@ -19,8 +19,9 @@ type Field = {width: int; height: int; mines: int} with
 end
 
 type MinesField = {game: Field; cells: Cell list} with
-  member f.Cell p = List.tryItem (f.game.Linear p) f.cells
+  member f.Cell linearPos = f.cells.Item linearPos
   member f.MustCell p = f.cells.Item (f.game.Linear p)
+  member f.MarkedAsBombsCount () = (f.cells |> List.filter (fun c -> c.state = MarkAsBomb)).Length
 end
 
 type GameState = Win | Lose | InGame | Paused

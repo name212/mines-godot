@@ -94,9 +94,24 @@ let changeCellState pos newState field =
     
   let cell = field.MustCell pos
   if cell.state <> newState then
-    buildNewField
+    if cell.state = MarkAsBomb && newState = Opened then
+      field
+    else
+      buildNewField
   else
     field
+    
+let changeBombsCellsStateTo state field =
+  field.cells
+  |> List.filter (_.hasBomb)
+  |> List.fold (fun f c -> changeCellState c.pos state f) field 
+
+let generateEmptyField (game: Field): MinesField =
+  let linearToCell p =
+    let x, y = game.Position p
+    {pos = { x = x; y = y }; hasBomb = false; state = Closed; bombsAround = 0 }
+  let cells = [0 .. game.Size] |> List.map linearToCell
+  {game = game; cells = cells }
 
 let generateRandomField (startPosition: Position) (game: Field) randomize : MinesField =
   let excludedPositions = positionsAround startPosition game @ [startPosition]
@@ -123,8 +138,13 @@ let generateRandomField (startPosition: Position) (game: Field) randomize : Mine
 
 let markToState (field: MinesField) position =
   let c = field.MustCell position
+  let fromClosedToMark () =
+    if field.MarkedAsBombsCount() >= field.game.mines then
+      MarkAsProbablyBomb
+    else
+      MarkAsBomb
   match c.state with
-  | Closed -> MarkAsBomb
+  | Closed -> fromClosedToMark()
   | MarkAsBomb -> MarkAsProbablyBomb
   | MarkAsProbablyBomb -> Closed
   | Opened -> Opened
