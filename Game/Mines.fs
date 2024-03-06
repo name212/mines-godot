@@ -41,16 +41,18 @@ type public Mines(width, height, bombs, timer: Timer) =
         
         let onWin t fld =
             pause t
-            fld
+            let fl = Logic.changeBombsCellsStateTo MarkAsBomb fld
+            Some(fl)
         let onLose t fld =
             pause t
-            fld
-        
+            let fl = Logic.changeBombsCellsStateTo Opened fld
+            Some(fl)
+   
         gameState <- Logic.calcGameState f
         let t = timer.Now()
         field <- match gameState with
-                 | Win -> onWin t (Some(f))
-                 | Lose ->  onLose t (Some(f))
+                 | Win -> onWin t f
+                 | Lose ->  onLose t f
                  | _ -> Some(f)
     
     let startGame pos =

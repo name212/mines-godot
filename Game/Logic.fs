@@ -100,6 +100,11 @@ let changeCellState pos newState field =
       buildNewField
   else
     field
+    
+let changeBombsCellsStateTo state field =
+  field.cells
+  |> List.filter (_.hasBomb)
+  |> List.fold (fun f c -> changeCellState c.pos state f) field 
 
 let generateEmptyField (game: Field): MinesField =
   let linearToCell p =
