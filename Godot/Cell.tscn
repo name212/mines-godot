@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bgxuv1kwb0k0m"]
+
+[ext_resource type="Script" path="res://Cell.cs" id="1_a58eh"]
+
+[node name="Cell" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_a58eh")
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
