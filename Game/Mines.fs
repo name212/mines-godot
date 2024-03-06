@@ -78,7 +78,7 @@ type public Mines(width, height, bombs, timer: Timer) =
     
     member this.Open pos =
         match gameState with
-        | Win | Lose -> ()
+        | Win | Lose | Paused -> ()
         | _ -> match field with
                | None -> startGame pos
                | Some _ -> open' pos Opened

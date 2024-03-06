@@ -1,10 +1,12 @@
 using Godot;
 using System;
 
-public partial class GameField : Node2D
+public partial class GameField : Control
 {
 	private const string LabelsContainerPath = "VBoxContainer/HBoxContainer/VBoxContainer";
 	private const string FieldContainerPath = "VBoxContainer/CenterContainer";
+	private const string GridContainerName = "Field";
+
 
 	private int _curDuration = -1;
 	private int _curMinesCount = -1;
@@ -57,15 +59,13 @@ public partial class GameField : Node2D
 		{
 			return;
 		}
-
-		const string gridContainerName = "Field";
 		
 		GD.Print("Field should update");
 		
 		var settings = field.game;
 		
 		var fieldView = new GridContainer();
-		fieldView.Name = gridContainerName;
+		fieldView.Name = GridContainerName;
 		fieldView.Columns = settings.width;
 		fieldView.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
 
@@ -78,17 +78,21 @@ public partial class GameField : Node2D
 			fieldView.AddChild(cellView);
 		}
 		
-		var minSize = fieldView.GetChild<Control>(0)._GetMinimumSize();
-		GetWindow().Size = new Vector2I((int)minSize.X * settings.width + settings.width * 5, (int) minSize.Y * settings.height + settings.height * 5 + 50);
-		const string fullPath = $"{FieldContainerPath}";
-		var fieldContainer = GetNode<CenterContainer>(fullPath);
-		var oldFieldView = fieldContainer.GetNode<GridContainer>(gridContainerName);
+		var fieldContainer = GetNode<CenterContainer>(FieldContainerPath);
+		var oldFieldView = fieldContainer.GetNode<GridContainer>(GridContainerName);
 		if (oldFieldView != null)
 		{
 			fieldContainer.RemoveChild(oldFieldView);
 		}
 		
 		fieldContainer.AddChild(fieldView);
+		var size = fieldContainer.GetNode<GridContainer>(GridContainerName).Size;
+		var headerSize = GetNode<HBoxContainer>("VBoxContainer/HBoxContainer").Size;
+		var windowSize = new Vector2I((int)size.X, (int) size.Y + (int) headerSize.Y + 10);
+		
+		GD.Print($"New window size {windowSize.X}x{windowSize.Y}");
+		GetWindow().Size = windowSize;
+		
 		_currentField = field;
 	}
 

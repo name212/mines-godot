@@ -16,7 +16,6 @@ public partial class MainScene : Node2D
 	public override void _Ready()
 	{
 		GetWindow().Size = new Vector2I(400, 400);
-		GetWindow().MinSize = new Vector2I(400, 400);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
