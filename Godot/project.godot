@@ -26,6 +26,7 @@ Game="*res://Game.cs"
 
 window/size/viewport_width=400
 window/size/viewport_height=400
+window/size/resizable=false
 
 [dotnet]
 
