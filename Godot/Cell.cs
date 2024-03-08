@@ -17,7 +17,7 @@ public partial class Cell(Types.Cell c) : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		Control cld = new Label();
+		Control cld = null ;
 		switch (c.state.Tag)
 		{
 			case Types.CellState.Tags.Closed:
@@ -63,8 +63,14 @@ public partial class Cell(Types.Cell c) : Control
 				cld = btn5;
 				break;
 		}
+		
+		if (cld == null)
+		{
+			GD.PrintErr($"Incorrect state {c.state.ToString()} for {c.pos.x}x{c.pos.y}");
+			return;
+		}
 
-		 cld.Size = MinSize;
+		cld.Size = MinSize;
 		
 		cld.Connect("gui_input", Callable.From<InputEvent>(OnInput));
 		AddChild(cld);
@@ -73,6 +79,16 @@ public partial class Cell(Types.Cell c) : Control
 	public override void _Process(double delta)
 	{
 	}
+
+	public override void _ExitTree()
+	{
+		base._ExitTree();
+		foreach (var cc in GetChildren())
+		{
+			cc.QueueFree();
+		}
+	}
+
 
 	public override Vector2 _GetMinimumSize()
 	{
