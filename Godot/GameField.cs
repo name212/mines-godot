@@ -83,6 +83,12 @@ public partial class GameField : Control
 		if (oldFieldView != null)
 		{
 			fieldContainer.RemoveChild(oldFieldView);
+			var cldren = oldFieldView.GetChildren();
+			foreach (var c in cldren)
+			{
+				c.QueueFree();
+			}
+			oldFieldView.QueueFree();
 		}
 		
 		fieldContainer.AddChild(fieldView);
@@ -114,6 +120,7 @@ public partial class GameField : Control
 	{
 		GD.Print("_on_new_game_button_pressed");
 		Game.GetGame(this).PauseOrResume();
+		PrintOrphanNodes();
 	}
 	
 	private void HandleCellLeftClick(int x, int y)
