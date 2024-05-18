@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Security.Claims;
 
-public partial class Cell(Types.Cell c) : Control
+public partial class Cell : Control
 {
 	private static readonly Vector2 MinSize = new Vector2(40, 40);
 	private static readonly Texture2D MarkAsBombTxt = GD.Load<Texture2D>("res://assets/marked.png");
@@ -13,6 +13,12 @@ public partial class Cell(Types.Cell c) : Control
 	public delegate void LeftClickEventHandler(int x, int y);
 	[Signal]
 	public delegate void RightClickEventHandler(int x, int y);
+
+	private Types.Cell c;
+
+	public Cell(Types.Cell c) {
+		this.c = c;
+	}
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
