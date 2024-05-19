@@ -24,13 +24,15 @@ Game="*res://Game.cs"
 
 [display]
 
-window/size/viewport_width=400
-window/size/viewport_height=400
-window/size/resizable=false
+window/stretch/mode="viewport"
 
 [dotnet]
 
 project/assembly_name="Godot"
+
+[input_devices]
+
+pointing/android/enable_long_press_as_right_click=true
 
 [rendering]
 

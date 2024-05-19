@@ -67,12 +67,19 @@ public partial class GameField : Control
 		var fieldView = new GridContainer();
 		fieldView.Name = GridContainerName;
 		fieldView.Columns = settings.width;
-		fieldView.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+		fieldView.Size = new Vector2(1152.0f, 648.0f);
 
+		var controlls = GetNode<HBoxContainer>("VBoxContainer/HBoxContainer");
+		var w = (1152.0f / settings.width) - 5;
+		var h = ((648.0f - controlls.Size.Y) / settings.height) - 5;
+		GD.Print($"Cell {w}x{h}");
+		var s = Math.Min(w, h);
+		var sz = new Vector2(s, s);
+		GD.Print($"New cell size {s}x{s}");
 		for (int pos = 0; pos < settings.Size; pos++)
 		{
 			var cell = field.Cell(pos);
-			var cellView = new Cell(cell);
+			var cellView = new Cell(cell, sz);
 			cellView.LeftClick += HandleCellLeftClick;
 			cellView.RightClick += HandleCellRightClick;
 			fieldView.AddChild(cellView);
@@ -92,13 +99,6 @@ public partial class GameField : Control
 		}
 		
 		fieldContainer.AddChild(fieldView);
-		var size = fieldContainer.GetNode<GridContainer>(GridContainerName).Size;
-		var headerSize = GetNode<HBoxContainer>("VBoxContainer/HBoxContainer").Size;
-		var windowSize = new Vector2I((int)size.X, (int) size.Y + (int) headerSize.Y + 10);
-		
-		GD.Print($"New window size {windowSize.X}x{windowSize.Y}");
-		GetWindow().Size = windowSize;
-		
 		_currentField = field;
 	}
 
