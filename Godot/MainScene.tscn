@@ -6,8 +6,16 @@
 script = ExtResource("1_gm2nr")
 
 [node name="MainContainer" type="CenterContainer" parent="."]
-offset_right = 400.0
-offset_bottom = 400.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -2.0
+offset_right = 1156.0
+offset_bottom = 654.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="InputContainer" type="GridContainer" parent="MainContainer"]
 layout_mode = 2
@@ -21,7 +29,7 @@ text = "Width"
 layout_mode = 2
 min_value = 8.0
 max_value = 99.0
-value = 8.0
+value = 30.0
 
 [node name="HeightLabel" type="Label" parent="MainContainer/InputContainer"]
 layout_mode = 2
@@ -31,7 +39,7 @@ text = "Height"
 layout_mode = 2
 min_value = 8.0
 max_value = 99.0
-value = 8.0
+value = 16.0
 
 [node name="MinesLabel" type="Label" parent="MainContainer/InputContainer"]
 layout_mode = 2
@@ -41,12 +49,12 @@ text = "Mines"
 layout_mode = 2
 min_value = 1.0
 max_value = 9000.0
-value = 10.0
+value = 99.0
 
 [node name="OptionButton" type="OptionButton" parent="MainContainer/InputContainer"]
 layout_mode = 2
 item_count = 3
-selected = 0
+selected = 2
 popup/item_0/text = "8x8 (10)"
 popup/item_0/id = 0
 popup/item_1/text = "16x16 (40)"
