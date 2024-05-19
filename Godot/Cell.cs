@@ -38,6 +38,8 @@ public partial class Cell : Control
 					btn2.Icon = BombTxt;
 					btn2.IconAlignment = HorizontalAlignment.Center;
 					btn2.VerticalIconAlignment = VerticalAlignment.Center;
+					btn2.ExpandIcon = true;
+					btn2.Disabled = true;
 					cld = btn2;
 				} else if (c.bombsAround > 0)
 				{
@@ -58,6 +60,7 @@ public partial class Cell : Control
 			case Types.CellState.Tags.MarkAsBomb:
 				var btn4 = new Button();
 				btn4.Icon = MarkAsBombTxt;
+				btn4.ExpandIcon = true;
 				btn4.IconAlignment = HorizontalAlignment.Center;
 				btn4.VerticalIconAlignment = VerticalAlignment.Center;
 				cld = btn4;
@@ -65,6 +68,7 @@ public partial class Cell : Control
 			case Types.CellState.Tags.MarkAsProbablyBomb:
 				var btn5 = new Button();
 				btn5.Icon = MarkAsProbablyBombTxt;
+				btn5.ExpandIcon = true;
 				btn5.IconAlignment = HorizontalAlignment.Center;
 				btn5.VerticalIconAlignment = VerticalAlignment.Center;
 				cld = btn5;
@@ -104,7 +108,6 @@ public partial class Cell : Control
 
 	private void OnInput(InputEvent e)
 	{
-		
 		if (e is InputEventScreenTouch touch)
 		{
 			GD.Print($"Handle Touch screen events {touch.ToString()}");
