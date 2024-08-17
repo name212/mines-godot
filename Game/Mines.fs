@@ -85,7 +85,7 @@ type public Mines(width, height, bombs, timer: Timer) =
     
     member this.Mark pos =
         match gameState with
-        | Win | Lose -> ()
+        | Win | Lose | Paused -> ()
         | _ -> match field with
                | None -> ()
                | Some f ->  open' pos (Logic.markToState f pos)

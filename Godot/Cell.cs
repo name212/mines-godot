@@ -6,19 +6,13 @@ public partial class Cell : Control
 	private static readonly Texture2D MarkAsBombTxt = GD.Load<Texture2D>("res://assets/marked.png");
 	private static readonly Texture2D MarkAsProbablyBombTxt = GD.Load<Texture2D>("res://assets/probablyMarked.png");
 	private static readonly Texture2D BombTxt = GD.Load<Texture2D>("res://assets/mine.png");
-	
-	[Signal]
-	public delegate void LeftClickEventHandler(int x, int y);
-	[Signal]
-	public delegate void RightClickEventHandler(int x, int y);
 
-	private Types.Cell c;
+	public Types.Cell c;
 	private readonly Vector2 _size;
-	private long _startPressed = 0;
 
 	public Cell(Types.Cell c, Vector2 s) {
 		this.c = c;
-		this._size = s;
+		_size = s;
 	}
 
 	// Called when the node enters the scene tree for the first time.
@@ -80,7 +74,6 @@ public partial class Cell : Control
 
 		cld.Size = _size;
 		
-		cld.Connect("gui_input", Callable.From<InputEvent>(OnInput));
 		AddChild(cld);
 	}
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -105,64 +98,6 @@ public partial class Cell : Control
 
 	private void OnInput(InputEvent e)
 	{
-		if (e is InputEventScreenTouch touch)
-		{
-			GD.Print($"Handle Touch screen events {touch.ToString()}");
-			if (touch.IsPressed())
-			{
-				if (_startPressed == 0)
-				{
-					var now = DateTime.UtcNow;
-					_startPressed = ((DateTimeOffset)now).ToUnixTimeMilliseconds();
-					GD.Print($"Start touch {_startPressed}");
-				}
-				else
-				{
-					GD.Print($"Touch already started {_startPressed}");
-				}
-			}
-			else
-			{
-				var now = DateTime.UtcNow;
-				var nowUnix = ((DateTimeOffset)now).ToUnixTimeMilliseconds();
-				var start = _startPressed;
-				GD.Print($"Touch finishes {nowUnix} - {_startPressed} = {nowUnix - start}");
-				_startPressed = 0;
-				if (nowUnix - start > 180)
-				{
-					GD.Print($"Long tap on cell {c.pos.x}x{c.pos.y}");
-					EmitSignal(SignalName.RightClick, c.pos.x, c.pos.y);
-					return;
-				}
-				
-				GD.Print($"Short tap on cell {c.pos.x}x{c.pos.y}");
-				EmitSignal(SignalName.LeftClick, c.pos.x, c.pos.y);
-				
-			}
-
-			return;
-		}
-
-		var os = OS.Singleton.GetName();
-		if (os != "Android")
-		{
-			if (!e.IsPressed()) return;
 		
-			if (e is not InputEventMouseButton mouse) return;
-			switch (mouse.ButtonIndex)
-			{
-				case MouseButton.Left:
-					GD.Print($"Left pressed on cell {c.pos.x}x{c.pos.y}");
-					EmitSignal(SignalName.LeftClick, c.pos.x, c.pos.y);
-					break;
-				case MouseButton.Right:
-					GD.Print($"Right pressed on cell {c.pos.x}x{c.pos.y}");
-					EmitSignal(SignalName.RightClick, c.pos.x, c.pos.y);
-					break;
-				default:
-					GD.Print($"Unknown mouse button pressed on cell {c.pos.x}x{c.pos.y}");
-					break;
-			}	
-		}
 	}
 }
