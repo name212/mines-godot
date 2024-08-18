@@ -37,7 +37,8 @@ public partial class GameField : Control
 			if (e.DoubleTap)
 			{
 				_startPressed = 0;
-				var cell = FindCellByPosition(e.Position);
+				var pos = GetViewport().CanvasTransform.AffineInverse() * e.Position;
+				var cell = FindCellByPosition(pos);
 				if (cell == null)
 				{
 					return;
@@ -72,7 +73,8 @@ public partial class GameField : Control
 			_startPressed = 0;
 			if (nowUnix - start > 180)
 			{
-				var cellR = FindCellByPosition(e.Position);
+				var pos = GetViewport().CanvasTransform.AffineInverse() * e.Position;
+				var cellR = FindCellByPosition(pos);
 				if (cellR == null)
 				{
 					return;
@@ -138,7 +140,8 @@ public partial class GameField : Control
 			switch (mouse.ButtonIndex)
 			{
 				case MouseButton.Left:
-					var cell = FindCellByPosition(mouse.Position);
+					var pos = GetViewport().CanvasTransform.AffineInverse() * mouse.Position;
+					var cell = FindCellByPosition(pos);
 					if (cell == null)
 					{
 						return;
@@ -147,7 +150,8 @@ public partial class GameField : Control
 					HandleCellLeftClick(cell.c.pos.x, cell.c.pos.y);
 					return;
 				case MouseButton.Right:
-					var cellR = FindCellByPosition(mouse.Position);
+					var posR = GetViewport().CanvasTransform.AffineInverse() * mouse.Position;
+					var cellR = FindCellByPosition(posR);
 					if (cellR == null)
 					{
 						return;
