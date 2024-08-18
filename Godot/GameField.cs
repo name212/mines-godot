@@ -1,5 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 public partial class GameField : Control
 {
@@ -7,15 +10,182 @@ public partial class GameField : Control
 	private const string FieldContainerPath = "VBoxContainer/CenterContainer";
 	private const string GridContainerName = "Field";
 
+	private const float PanSpeed = 1.0f; 
 
 	private int _curDuration = -1;
 	private int _curMinesCount = -1;
 	private int _curMarkedMinesCount = -1;
-	
+	private long _startPressed = 0;
+
+
+	private Dictionary<int, Vector2> _touchPoints = new Dictionary<int, Vector2>();
+		
 	private Types.MinesField _currentField;
+
+	private Camera2D _camera;
+	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_camera = GetNode<Camera2D>("Camera2D"); 
+	}
+
+	private void HandleTouch(InputEventScreenTouch e)
+	{
+		if (e.Pressed)
+		{
+			if (e.DoubleTap)
+			{
+				_startPressed = 0;
+				var pos = GetViewport().CanvasTransform.AffineInverse() * e.Position;
+				var cell = FindCellByPosition(pos);
+				if (cell == null)
+				{
+					return;
+				}
+				GD.Print($"Double tap on cell {cell.c.pos}");
+				HandleCellLeftClick(cell.c.pos.x, cell.c.pos.y);
+				return;
+			}
+			
+			GD.Print("Handle touch: pressed");
+			_touchPoints[e.Index] = e.Position;
+			if (_startPressed == 0)
+			{
+				var now = DateTime.UtcNow;
+				_startPressed = ((DateTimeOffset)now).ToUnixTimeMilliseconds();
+				GD.Print($"Start touch {_startPressed}");
+			}
+			else
+			{
+				GD.Print($"Touch already started {_startPressed}");
+			}
+		}
+		else
+		{
+			GD.Print("Handle touch: not pressed");
+			_touchPoints.Remove(e.Index);
+			
+			var now = DateTime.UtcNow;
+			var nowUnix = ((DateTimeOffset)now).ToUnixTimeMilliseconds();
+			var start = _startPressed;
+			GD.Print($"Touch finishes {nowUnix} - {_startPressed} = {nowUnix - start}");
+			_startPressed = 0;
+			if (nowUnix - start > 180)
+			{
+				var pos = GetViewport().CanvasTransform.AffineInverse() * e.Position;
+				var cellR = FindCellByPosition(pos);
+				if (cellR == null)
+				{
+					return;
+				}
+				GD.Print($"Long tap on cell {cellR.c.pos}");
+				HandleCellRightClick(cellR.c.pos.x, cellR.c.pos.y);
+				return;
+			}
+		}
+	}
+	
+	private void HandleDrag(InputEventScreenDrag e)
+	{
+		_touchPoints[e.Index] = e.Position;
+		if (_touchPoints.Keys.Count == 1)
+		{
+			_camera.Position -= e.Relative * PanSpeed;
+			GD.Print($"HandleDrag set Position {Position}");
+			AcceptEvent();
+		}
+		
+	}
+
+	private void Zoom(InputEventMagnifyGesture e)
+	{
+		var newZoom = _camera.Zoom * e.Factor;
+			
+		if (newZoom.X < 0.1f)
+		{
+			newZoom.X = 0.1f;
+		}
+
+		if (newZoom.X > 10.0f)
+		{
+			newZoom.X = 10.0f;
+		}
+			
+		if (newZoom.Y < 0.1f)
+		{
+			newZoom.Y = 0.1f;
+		}
+
+		if (newZoom.Y > 10.0f)
+		{
+			newZoom.Y = 10.0f;
+		}
+
+		_camera.Zoom = newZoom;
+		
+		AcceptEvent();
+	}
+
+	public override void _Input(InputEvent e)
+	{
+		base._Input(e);
+		
+		var os = OS.Singleton.GetName();
+		if (os != "Android")
+		{
+			if (!e.IsPressed()) return;
+		
+			if (e is not InputEventMouseButton mouse) return;
+			switch (mouse.ButtonIndex)
+			{
+				case MouseButton.Left:
+					var pos = GetViewport().CanvasTransform.AffineInverse() * mouse.Position;
+					var cell = FindCellByPosition(pos);
+					if (cell == null)
+					{
+						return;
+					}
+					GD.Print($"Left pressed on cell {cell.c.pos}");
+					HandleCellLeftClick(cell.c.pos.x, cell.c.pos.y);
+					return;
+				case MouseButton.Right:
+					var posR = GetViewport().CanvasTransform.AffineInverse() * mouse.Position;
+					var cellR = FindCellByPosition(posR);
+					if (cellR == null)
+					{
+						return;
+					}
+					GD.Print($"Right pressed on cell {cellR.c.pos}");
+					HandleCellRightClick(cellR.c.pos.x, cellR.c.pos.y);
+					return;
+				default:
+					GD.Print($"Unknown mouse button pressed in position {mouse.Position}");
+					break;
+			}	
+			
+			return;
+		}
+
+		switch (e)
+		{
+			case InputEventMagnifyGesture magnify:
+				GD.Print(
+					$"Magnify event handle in screen {magnify.Position.Y}X{magnify.Position.Y} magnify {magnify.Factor}");
+				Zoom(magnify);
+				break;
+			case InputEventScreenTouch touch:
+				GD.Print(
+					$"Touch event {touch.Index} handle in screen {touch.Position.Y}X{touch.Position.Y} IsPressed {touch.Pressed} DoubleTap {touch.DoubleTap} Canceled {touch.Canceled}");
+				HandleTouch(touch);
+				break;
+			case InputEventScreenDrag drag:
+				GD.Print(
+					$"Drag event {drag.Index} handle in screen {drag.Position.Y}X{drag.Position.Y} Pressure {drag.Pressure} PenInverted {drag.PenInverted} Tilt {drag.Tilt.ToString()} velocity {drag.Velocity}");
+				HandleDrag(drag);
+				break;
+		}
+
 	}
 
 	private void UpdateCounters(Game game)
@@ -52,6 +222,24 @@ public partial class GameField : Control
 		}
 	}
 
+	private Cell FindCellByPosition(Vector2 pos)
+	{
+		var fieldContainer = GetNode<CenterContainer>(FieldContainerPath);
+		var fieldView = fieldContainer.GetNode<GridContainer>(GridContainerName);
+
+		foreach (var node in fieldView.GetChildren())
+		{
+			var ctrt = node as Cell;
+			if (ctrt.GetGlobalRect().HasPoint(pos))
+			{
+				GD.Print($"Found cell for rect {ctrt.GetRect()} at position {pos}");
+				return ctrt;
+			}
+		}
+
+		return null;
+	}
+
 	private void UpdateField(Game game)
 	{
 		var field = game.Field();
@@ -80,8 +268,6 @@ public partial class GameField : Control
 		{
 			var cell = field.Cell(pos);
 			var cellView = new Cell(cell, sz);
-			cellView.LeftClick += HandleCellLeftClick;
-			cellView.RightClick += HandleCellRightClick;
 			fieldView.AddChild(cellView);
 		}
 		
