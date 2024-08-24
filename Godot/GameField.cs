@@ -71,7 +71,7 @@ public partial class GameField : Control
 			var start = _startPressed;
 			GD.Print($"Touch finishes {nowUnix} - {_startPressed} = {nowUnix - start}");
 			_startPressed = 0;
-			if (nowUnix - start > 180)
+			if (nowUnix - start > 250)
 			{
 				var pos = GetViewport().CanvasTransform.AffineInverse() * e.Position;
 				var cellR = FindCellByPosition(pos);
