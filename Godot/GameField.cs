@@ -1,13 +1,14 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+
 
 public partial class GameField : Control
 {
+	private const float FieldWidth = 1152.0f;
+	private const float FieldHeight = 648.0f;
 	private const string LabelsContainerPath = "VBoxContainer/HBoxContainer/VBoxContainer";
-	private const string FieldContainerPath = "VBoxContainer/CenterContainer";
+	private const string FieldContainerPath = "SubViewport/Viewport/CenterContainer";
 	private const string GridContainerName = "Field";
 
 	private const float PanSpeed = 1.0f; 
@@ -23,11 +24,19 @@ public partial class GameField : Control
 	private Types.MinesField _currentField;
 
 	private Camera2D _camera;
+	private SubViewport _fieldViewPort;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		_camera = GetNode<Camera2D>("Camera2D"); 
+		_camera = GetNode<Camera2D>("SubViewport/Viewport/Camera2D"); 
+		_fieldViewPort = GetNode<SubViewport>("SubViewport/Viewport"); 
+	}
+
+	private long Now()
+	{
+		var now = DateTime.UtcNow;
+		return ((DateTimeOffset)now).ToUnixTimeMilliseconds();
 	}
 
 	private void HandleTouch(InputEventScreenTouch e)
@@ -37,7 +46,7 @@ public partial class GameField : Control
 			if (e.DoubleTap)
 			{
 				_startPressed = 0;
-				var pos = GetViewport().CanvasTransform.AffineInverse() * e.Position;
+				var pos = _fieldViewPort.CanvasTransform.AffineInverse() * e.Position;
 				var cell = FindCellByPosition(pos);
 				if (cell == null)
 				{
@@ -65,15 +74,14 @@ public partial class GameField : Control
 		{
 			GD.Print("Handle touch: not pressed");
 			_touchPoints.Remove(e.Index);
-			
-			var now = DateTime.UtcNow;
-			var nowUnix = ((DateTimeOffset)now).ToUnixTimeMilliseconds();
+
+			var nowUnix = Now();
 			var start = _startPressed;
 			GD.Print($"Touch finishes {nowUnix} - {_startPressed} = {nowUnix - start}");
 			_startPressed = 0;
-			if (nowUnix - start > 180)
+			if (nowUnix - start > 250)
 			{
-				var pos = GetViewport().CanvasTransform.AffineInverse() * e.Position;
+				var pos = _fieldViewPort.CanvasTransform.AffineInverse() * e.Position;
 				var cellR = FindCellByPosition(pos);
 				if (cellR == null)
 				{
@@ -91,6 +99,7 @@ public partial class GameField : Control
 		_touchPoints[e.Index] = e.Position;
 		if (_touchPoints.Keys.Count == 1)
 		{
+			_startPressed = Now();
 			_camera.Position -= e.Relative * PanSpeed;
 			GD.Print($"HandleDrag set Position {Position}");
 			AcceptEvent();
@@ -123,6 +132,7 @@ public partial class GameField : Control
 		}
 
 		_camera.Zoom = newZoom;
+		_startPressed = Now();
 		
 		AcceptEvent();
 	}
@@ -140,7 +150,7 @@ public partial class GameField : Control
 			switch (mouse.ButtonIndex)
 			{
 				case MouseButton.Left:
-					var pos = GetViewport().CanvasTransform.AffineInverse() * mouse.Position;
+					var pos = _fieldViewPort.CanvasTransform.AffineInverse() * mouse.Position;
 					var cell = FindCellByPosition(pos);
 					if (cell == null)
 					{
@@ -150,7 +160,7 @@ public partial class GameField : Control
 					HandleCellLeftClick(cell.c.pos.x, cell.c.pos.y);
 					return;
 				case MouseButton.Right:
-					var posR = GetViewport().CanvasTransform.AffineInverse() * mouse.Position;
+					var posR = _fieldViewPort.CanvasTransform.AffineInverse() * mouse.Position;
 					var cellR = FindCellByPosition(posR);
 					if (cellR == null)
 					{
@@ -255,11 +265,11 @@ public partial class GameField : Control
 		var fieldView = new GridContainer();
 		fieldView.Name = GridContainerName;
 		fieldView.Columns = settings.width;
-		fieldView.Size = new Vector2(1152.0f, 648.0f);
+		fieldView.Size = new Vector2(FieldWidth, FieldHeight);
 
 		var controlls = GetNode<HBoxContainer>("VBoxContainer/HBoxContainer");
-		var w = (1152.0f / settings.width) - 5;
-		var h = ((648.0f - controlls.Size.Y) / settings.height) - 5;
+		var w = (FieldWidth / settings.width) - 5;
+		var h = ((FieldHeight - controlls.Size.Y) / settings.height) - 5;
 		GD.Print($"Cell {w}x{h}");
 		var s = Math.Min(w, h);
 		var sz = new Vector2(s, s);
@@ -283,7 +293,7 @@ public partial class GameField : Control
 			}
 			oldFieldView.QueueFree();
 		}
-		
+
 		fieldContainer.AddChild(fieldView);
 		_currentField = field;
 	}
