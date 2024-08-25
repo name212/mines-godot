@@ -10,16 +10,14 @@ public partial class GameField : Control
 	private const string LabelsContainerPath = "VBoxContainer/HBoxContainer/VBoxContainer";
 	private const string FieldContainerPath = "SubViewport/Viewport/CenterContainer";
 	private const string GridContainerName = "Field";
-
 	private const float PanSpeed = 1.0f; 
 
 	private int _curDuration = -1;
 	private int _curMinesCount = -1;
 	private int _curMarkedMinesCount = -1;
 	private long _startPressed = 0;
-
-
-	private Dictionary<int, Vector2> _touchPoints = new Dictionary<int, Vector2>();
+	
+	private readonly Dictionary<int, Vector2> _touchPoints = new Dictionary<int, Vector2>();
 		
 	private Types.MinesField _currentField;
 
@@ -39,6 +37,19 @@ public partial class GameField : Control
 		return ((DateTimeOffset)now).ToUnixTimeMilliseconds();
 	}
 
+	private void ClickHandle(Vector2 clickPos, Action<int, int> handler, string debugMsg)
+	{
+		var pos = _fieldViewPort.CanvasTransform.AffineInverse() * clickPos;
+		var cell = FindCellByPosition(pos);
+		if (cell == null)
+		{
+			GD.Print($"Cell not found at position {clickPos.X}; {clickPos.Y}");
+			return;
+		}
+		GD.Print($"{debugMsg} {cell.GameCell.pos}");
+		handler(cell.GameCell.pos.x, cell.GameCell.pos.y);
+	}
+
 	private void HandleTouch(InputEventScreenTouch e)
 	{
 		if (e.Pressed)
@@ -46,14 +57,7 @@ public partial class GameField : Control
 			if (e.DoubleTap)
 			{
 				_startPressed = 0;
-				var pos = _fieldViewPort.CanvasTransform.AffineInverse() * e.Position;
-				var cell = FindCellByPosition(pos);
-				if (cell == null)
-				{
-					return;
-				}
-				GD.Print($"Double tap on cell {cell.c.pos}");
-				HandleCellLeftClick(cell.c.pos.x, cell.c.pos.y);
+				ClickHandle(e.Position, HandleCellLeftClick, "Double tap");
 				return;
 			}
 			
@@ -81,14 +85,7 @@ public partial class GameField : Control
 			_startPressed = 0;
 			if (nowUnix - start > 250)
 			{
-				var pos = _fieldViewPort.CanvasTransform.AffineInverse() * e.Position;
-				var cellR = FindCellByPosition(pos);
-				if (cellR == null)
-				{
-					return;
-				}
-				GD.Print($"Long tap on cell {cellR.c.pos}");
-				HandleCellRightClick(cellR.c.pos.x, cellR.c.pos.y);
+				ClickHandle(e.Position, HandleCellRightClick, "Long tap ");
 				return;
 			}
 		}
@@ -150,24 +147,10 @@ public partial class GameField : Control
 			switch (mouse.ButtonIndex)
 			{
 				case MouseButton.Left:
-					var pos = _fieldViewPort.CanvasTransform.AffineInverse() * mouse.Position;
-					var cell = FindCellByPosition(pos);
-					if (cell == null)
-					{
-						return;
-					}
-					GD.Print($"Left pressed on cell {cell.c.pos}");
-					HandleCellLeftClick(cell.c.pos.x, cell.c.pos.y);
+					ClickHandle(mouse.Position, HandleCellLeftClick, "Left click");
 					return;
 				case MouseButton.Right:
-					var posR = _fieldViewPort.CanvasTransform.AffineInverse() * mouse.Position;
-					var cellR = FindCellByPosition(posR);
-					if (cellR == null)
-					{
-						return;
-					}
-					GD.Print($"Right pressed on cell {cellR.c.pos}");
-					HandleCellRightClick(cellR.c.pos.x, cellR.c.pos.y);
+					ClickHandle(mouse.Position, HandleCellRightClick, "Left click");
 					return;
 				default:
 					GD.Print($"Unknown mouse button pressed in position {mouse.Position}");
