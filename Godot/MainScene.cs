@@ -1,31 +1,19 @@
 using Godot;
-using System;
 
 public partial class MainScene : Node2D
 {
 	private const string InputsContainerPath = "MainContainer/InputContainer";
 
-	private Types.Field[] GamesSelected = new[]
+	private readonly Types.Field[] _gamesSelected = new[]
 	{
 		new Types.Field(8, 8, 10),
 		new Types.Field(16, 16, 40),
 		new Types.Field(30, 16, 99),
 	};
 
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	private void OnStartButtonPressed()
 	{
-		//GetWindow().Size = new Vector2I(400, 400);
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
-
-	private void _on_start_btn_pressed()
-	{
-		GD.Print("_on_start_btn_pressed");
+		GD.Print("OnStartButtonPressed");
 
 		var width = (int) GetNode<SpinBox>($"{InputsContainerPath}/Width").Value;
 		var height = (int) GetNode<SpinBox>($"{InputsContainerPath}/Height").Value;
@@ -40,14 +28,14 @@ public partial class MainScene : Node2D
 		GetTree().ChangeSceneToFile("res://GameField.tscn");
 	}
 	
-	private void _on_option_button_item_selected(long index)
+	private void GameKindSelected(long index)
 	{
-		var gm = GamesSelected[index];
+		GD.Print("OnStartButtonPressed");
+
+		var gm = _gamesSelected[index];
 		
 		GetNode<SpinBox>($"{InputsContainerPath}/Width").Value = gm.width;
 		GetNode<SpinBox>($"{InputsContainerPath}/Height").Value = gm.height;
 		GetNode<SpinBox>($"{InputsContainerPath}/Mines").Value = gm.mines;
 	}
 }
-
-

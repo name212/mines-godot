@@ -67,5 +67,5 @@ layout_mode = 2
 action_mode = 0
 text = "Start"
 
-[connection signal="item_selected" from="MainContainer/InputContainer/OptionButton" to="." method="_on_option_button_item_selected"]
-[connection signal="pressed" from="MainContainer/InputContainer/StartBtn" to="." method="_on_start_btn_pressed"]
+[connection signal="item_selected" from="MainContainer/InputContainer/OptionButton" to="." method="GameKindSelected"]
+[connection signal="pressed" from="MainContainer/InputContainer/StartBtn" to="." method="OnStartButtonPressed"]

@@ -7,11 +7,11 @@ public partial class Cell : Control
 	private static readonly Texture2D MarkAsProbablyBombTxt = GD.Load<Texture2D>("res://assets/probablyMarked.png");
 	private static readonly Texture2D BombTxt = GD.Load<Texture2D>("res://assets/mine.png");
 
-	public Types.Cell c;
+	public readonly Types.Cell GameCell;
 	private readonly Vector2 _size;
 
-	public Cell(Types.Cell c, Vector2 s) {
-		this.c = c;
+	public Cell(Types.Cell gameCell, Vector2 s) {
+		GameCell = gameCell;
 		_size = s;
 	}
 
@@ -19,14 +19,14 @@ public partial class Cell : Control
 	public override void _Ready()
 	{
 		Control cld = null ;
-		switch (c.state.Tag)
+		switch (GameCell.state.Tag)
 		{
 			case Types.CellState.Tags.Closed:
 				var b = new Button();
 				cld = b;
 				break;
 			case Types.CellState.Tags.Opened:
-				if (c.hasBomb)
+				if (GameCell.hasBomb)
 				{
 					var btn2 = new Button();
 					btn2.Icon = BombTxt;
@@ -34,15 +34,15 @@ public partial class Cell : Control
 					btn2.VerticalIconAlignment = VerticalAlignment.Center;
 					btn2.Disabled = true;
 					cld = btn2;
-				} else if (c.bombsAround > 0)
+				} else if (GameCell.bombsAround > 0)
 				{
 					var lbl = new Label();
 					lbl.MouseFilter = MouseFilterEnum.Pass;
-					lbl.Text = c.bombsAround.ToString();
+					lbl.Text = GameCell.bombsAround.ToString();
 					lbl.HorizontalAlignment = HorizontalAlignment.Center;
 					lbl.VerticalAlignment = VerticalAlignment.Center;
 					cld = lbl;
-				} else if (c.bombsAround == 0)
+				} else if (GameCell.bombsAround == 0)
 				{
 					var btn3 = new Button();
 					btn3.Disabled = true;
@@ -68,7 +68,7 @@ public partial class Cell : Control
 		
 		if (cld == null)
 		{
-			GD.PrintErr($"Incorrect state {c.state.ToString()} for {c.pos.x}x{c.pos.y}");
+			GD.PrintErr($"Incorrect state {GameCell.state} for {GameCell.pos.x}x{GameCell.pos.y}");
 			return;
 		}
 
@@ -76,11 +76,7 @@ public partial class Cell : Control
 		
 		AddChild(cld);
 	}
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
-
+	
 	public override void _ExitTree()
 	{
 		base._ExitTree();
@@ -90,14 +86,8 @@ public partial class Cell : Control
 		}
 	}
 
-
 	public override Vector2 _GetMinimumSize()
 	{
 		return _size;
-	}
-
-	private void OnInput(InputEvent e)
-	{
-		
 	}
 }
